@@ -1,0 +1,17 @@
+# Local credentials and environment configuration
+.env
+.env.*
+!.env.example
+
+# Local agent skills and lockfile
+/.agents/
+/skills-lock.json
+
+# Python generated files and local environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# macOS metadata
+.DS_Store
