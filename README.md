@@ -7,6 +7,7 @@
 | 目录 | 用途 | 说明 |
 | --- | --- | --- |
 | `skill-test-1` | 使用 Python 计算两个整数的最小公倍数 | [技能说明](skill-test-1/SKILL.md) |
+| `skill-test-2` | 使用 Node.js 计算两个整数的最大公约数 | [技能说明](skill-test-2/SKILL.md) |
 
 ## 运行示例
 
@@ -17,6 +18,14 @@ python3 skill-test-1/scripts/lcm.py 12 18
 ```
 
 输出 `36`。
+
+最大公约数 demo 需要支持 BigInt 的 Node.js，无需额外依赖：
+
+```bash
+node skill-test-2/scripts/gcd.js 12 18
+```
+
+输出 `6`。
 
 ## 目录约定
 
