@@ -1,0 +1,209 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "segmentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "shotId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "enum": [
+              "keyframe",
+              "first_frame",
+              "last_frame"
+            ]
+          },
+          "file": {
+            "type": "string",
+            "minLength": 1
+          },
+          "prompt": {
+            "type": "string",
+            "minLength": 1
+          },
+          "referenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          },
+          "qc": {
+            "type": "object",
+            "properties": {
+              "checked": {
+                "type": "boolean"
+              },
+              "notes": {
+                "type": "string",
+                "minLength": 1
+              },
+              "contextFingerprint": {
+                "type": "string",
+                "minLength": 1
+              },
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "requirement": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "priority": {
+                      "enum": [
+                        "critical",
+                        "normal"
+                      ]
+                    },
+                    "weight": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "requirement",
+                    "priority",
+                    "weight"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1
+              },
+              "attempts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "attempt": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "file": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "prompt": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "correction": {
+                      "type": "string"
+                    },
+                    "checks": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "criterionId": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "result": {
+                            "enum": [
+                              "pass",
+                              "fail",
+                              "uncertain"
+                            ]
+                          },
+                          "observation": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        },
+                        "required": [
+                          "criterionId",
+                          "result",
+                          "observation"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "minItems": 1
+                    }
+                  },
+                  "required": [
+                    "attempt",
+                    "file",
+                    "sha256",
+                    "prompt",
+                    "correction",
+                    "checks"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1
+              },
+              "selectedAttempt": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "outcome": {
+                "enum": [
+                  "pending",
+                  "passed",
+                  "best_available"
+                ]
+              }
+            },
+            "required": [
+              "checked",
+              "notes",
+              "contextFingerprint",
+              "criteria",
+              "attempts",
+              "selectedAttempt",
+              "outcome"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "segmentId",
+          "shotId",
+          "role",
+          "file",
+          "prompt",
+          "referenceIds",
+          "qc"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "images"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "frames.schema.json",
+  "title": "frames"
+}

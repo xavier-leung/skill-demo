@@ -1,0 +1,165 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "episodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "cuts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "clipId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "in": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "out": {
+                  "type": "number",
+                  "minimum": 0.1
+                }
+              },
+              "required": [
+                "clipId",
+                "in",
+                "out"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1
+          },
+          "audioTracks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "gain": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "offset": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "role": {
+                  "enum": [
+                    "dialogue",
+                    "music",
+                    "ambience"
+                  ]
+                }
+              },
+              "required": [
+                "file",
+                "gain",
+                "offset",
+                "role"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0
+          },
+          "nativeGain": {
+            "type": "number",
+            "minimum": 0
+          },
+          "captions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "start": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "end": {
+                  "type": "number",
+                  "minimum": 0.1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "speaker": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "start",
+                "end",
+                "text"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0
+          },
+          "subtitleMode": {
+            "enum": [
+              "none",
+              "soft",
+              "burn"
+            ]
+          },
+          "file": {
+            "type": "string",
+            "minLength": 1
+          },
+          "qc": {
+            "type": "object",
+            "properties": {
+              "checked": {
+                "type": "boolean"
+              },
+              "notes": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "checked",
+              "notes"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "cuts",
+          "audioTracks",
+          "nativeGain",
+          "captions",
+          "subtitleMode",
+          "file",
+          "qc"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "episodes"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "edit.schema.json",
+  "title": "edit"
+}

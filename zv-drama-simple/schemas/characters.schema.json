@@ -1,0 +1,95 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "characters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "appearance": {
+            "type": "string",
+            "minLength": 1
+          },
+          "personality": {
+            "type": "string",
+            "minLength": 1
+          },
+          "costume": {
+            "type": "string",
+            "minLength": 1
+          },
+          "speechStyle": {
+            "type": "string",
+            "minLength": 1
+          },
+          "voiceDirection": {
+            "type": "string",
+            "minLength": 1
+          },
+          "imagePrompt": {
+            "type": "string",
+            "minLength": 1
+          },
+          "origin": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "source",
+                  "adapted",
+                  "invented"
+                ]
+              },
+              "evidence": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "kind",
+              "evidence",
+              "reason"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "appearance",
+          "personality",
+          "costume",
+          "speechStyle",
+          "voiceDirection",
+          "imagePrompt",
+          "origin"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "characters"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "characters.schema.json",
+  "title": "characters"
+}

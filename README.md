@@ -8,6 +8,7 @@
 | --- | --- | --- |
 | `skill-test-1` | 使用 Python 计算两个整数的最小公倍数 | [技能说明](skill-test-1/SKILL.md) |
 | `skill-test-2` | 使用 Node.js 计算两个整数的最大公约数 | [技能说明](skill-test-2/SKILL.md) |
+| `zv-drama-simple` | 小说到短剧的独立制作技能，版本 1.01；按 13 步生成并审核 | [技能说明](zv-drama-simple/SKILL.md) |
 
 ## 运行示例
 
@@ -33,3 +34,9 @@ node skill-test-2/scripts/gcd.js 12 18
 - 技能类 demo 使用 `SKILL.md` 说明用途，并将辅助脚本放在 `scripts/` 中。
 - 新增 demo 时更新上方列表，注明运行所需的环境和依赖。
 - 密钥和本地环境配置不提交到仓库。
+
+## 小说到短剧技能 1.01
+
+将 `zv-drama-simple` 目录安装到宿主的技能目录。需要 Python 3.10+、ffmpeg/ffprobe，以及宿主可用的图像与视频生成能力。视频工具动态发现，不默认绑定服务；素材上传由使用者配置，凭据和付费授权不随技能提供。
+
+包含流程脚本、只读 HTML 模板、JSON 格式、分镜知识库及角色版式参考。测试、演示脚本、生成项目及设计草稿仅保存在开发者本地，已由 `.gitignore` 排除。

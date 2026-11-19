@@ -1,0 +1,192 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceFile": {
+      "type": "string",
+      "minLength": 1,
+      "const": "source/novel.md"
+    },
+    "mode": {
+      "enum": [
+        "adaptation",
+        "expansion"
+      ]
+    },
+    "genre": {
+      "type": "string",
+      "minLength": 1
+    },
+    "episodeCount": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "episodeSeconds": {
+      "type": "number",
+      "minimum": 1
+    },
+    "scope": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "aspectRatio": {
+      "enum": [
+        "9:16",
+        "16:9"
+      ]
+    },
+    "style": {
+      "type": "string",
+      "minLength": 1
+    },
+    "adaptationScope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "audioMode": {
+      "enum": [
+        "native",
+        "external"
+      ]
+    },
+    "subtitles": {
+      "type": "boolean"
+    },
+    "imageProvider": {
+      "type": "string",
+      "minLength": 1
+    },
+    "wan3": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "enum": [
+            "ref2v",
+            "fl2v"
+          ]
+        },
+        "resolution": {
+          "enum": [
+            "480P",
+            "720P",
+            "1080P"
+          ]
+        },
+        "maxSegmentSeconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "audio": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "mode",
+        "resolution",
+        "maxSegmentSeconds",
+        "audio"
+      ],
+      "additionalProperties": false
+    },
+    "videoGeneration": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tool": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resolution": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "ready",
+            "unavailable"
+          ]
+        },
+        "maxSegmentSeconds": {
+          "type": "number",
+          "minimum": 0.1
+        },
+        "maxReferenceImages": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "maxReferenceAudio": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "integerSeconds": {
+          "type": "boolean"
+        },
+        "audio": {
+          "type": "boolean"
+        },
+        "supportedModes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "ref2v",
+              "fl2v"
+            ]
+          },
+          "minItems": 1
+        },
+        "supportsFirstLastWithReference": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "title",
+    "sourceFile",
+    "mode",
+    "genre",
+    "episodeCount",
+    "episodeSeconds",
+    "scope",
+    "aspectRatio",
+    "style",
+    "adaptationScope",
+    "audioMode",
+    "subtitles",
+    "imageProvider"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "brief.schema.json",
+  "title": "brief"
+}

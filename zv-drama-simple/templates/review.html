@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data: file:; media-src 'self' file:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>$title · $stage_label</title><style>$css</style></head>
+<body><aside><a class="brand" href="index.html">ZV<span>DRAMA SIMPLE</span></a><p class="project">$title</p><nav>$nav</nav><p class="aside-note">从文字，到画面<br>在聊天中确认每一步</p></aside>
+<main><a class="back-link" href="index.html">← 返回制作总览</a><header><div class="eyebrow">制作审核 / STEP $number</div><div class="heading"><h1>$stage_label</h1><span class="status">$status</span></div><p class="lead">$focus</p></header>
+<div class="notice">请在聊天中确认本步骤，或指出需要修改的条目。此页只展示，不会保存审批或修改。</div>
+<div class="meta"><span>版本 $revision</span><span>生成于 $time</span><span>指纹 <code>$fingerprint</code></span></div>
+$content
+<details class="raw"><summary>查看原始 JSON</summary><pre>$raw</pre></details>
+<footer>这是生成时的数据快照；源文件变化后请重新生成审核页。以聊天记录与项目当前状态为准。</footer></main></body></html>

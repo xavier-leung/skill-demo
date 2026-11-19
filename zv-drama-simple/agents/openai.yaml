@@ -1,0 +1,6 @@
+interface:
+  display_name: "小说到短剧 · 简版"
+  short_description: "独立完成小说到短剧视频，十三步只读网页审核，在聊天里逐步确认"
+  default_prompt: "使用 $zv-drama-simple 把我提供的小说制作成短剧，每一步生成只读 HTML 给我查看。需要确认时说明具体确认内容和确认后的下一步；不需要确认的工作持续执行，收到确认后直接继续。"
+policy:
+  allow_implicit_invocation: true

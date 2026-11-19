@@ -1,0 +1,186 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "locations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "imageId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "x": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "y": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "width": {
+                  "type": "number",
+                  "minimum": 0.001
+                },
+                "height": {
+                  "type": "number",
+                  "minimum": 0.001
+                },
+                "sittable": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "x",
+                "y",
+                "width",
+                "height",
+                "sittable"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1
+          },
+          "floorplanId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "imageId",
+          "items",
+          "floorplanId"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sceneId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "locationId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "places": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "characterId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "present": {
+                  "type": "boolean"
+                },
+                "itemId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "x": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "y": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "posture": {
+                  "enum": [
+                    "standing",
+                    "sitting",
+                    "lying"
+                  ]
+                },
+                "facing": {
+                  "enum": [
+                    "N",
+                    "NE",
+                    "E",
+                    "SE",
+                    "S",
+                    "SW",
+                    "W",
+                    "NW"
+                  ]
+                }
+              },
+              "required": [
+                "characterId",
+                "present",
+                "itemId",
+                "x",
+                "y",
+                "posture",
+                "facing"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1
+          },
+          "extras": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "extrasWhere": {
+            "type": "string",
+            "minLength": 1
+          },
+          "opening": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "sceneId",
+          "locationId",
+          "places",
+          "extras",
+          "extrasWhere",
+          "opening"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "locations",
+    "scenes"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "staging.schema.json",
+  "title": "staging"
+}
