@@ -37,11 +37,3 @@ def context(project,stage,image):
                                     'file':other['file'],'sha256':file_digest(local_path(project,other['file'])),
                                     'prompt':other['prompt'],'stage':source})
     return {'relations':relevant,'images':targets}
-
-
-def requirements(project,stage,image):
-    result=[]
-    for peer in context(project,stage,image)['images']:
-        for aspect in ('position','angle','scale','connection'):
-            result.append({'id':'adj_'+peer['relationId']+'_'+peer['id']+'_'+aspect,'peer':peer,'aspect':aspect})
-    return result

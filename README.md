@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | `skill-test-1` | 使用 Python 计算两个整数的最小公倍数 | [技能说明](skill-test-1/SKILL.md) |
 | `skill-test-2` | 使用 Node.js 计算两个整数的最大公约数 | [技能说明](skill-test-2/SKILL.md) |
-| `zv-drama-simple` | 小说到短剧的独立制作技能，版本 1.01；按 13 步生成并审核 | [技能说明](zv-drama-simple/SKILL.md) |
+| `zv-drama-simple` | 小说到短剧的独立制作技能，版本 1.01；按 12 步生成并审核 | [介绍与修改记录](zv-drama-simple/README.md) · [技能说明](zv-drama-simple/SKILL.md) |
 
 ## 运行示例
 

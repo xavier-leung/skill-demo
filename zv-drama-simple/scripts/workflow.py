@@ -47,8 +47,14 @@ def require_prior(project, stage):
 def refresh(project):
     project=Path(project)
     states=status(project)
+    # Remove the obsolete generated page; retain legacy decisions and source data.
+    legacy_page=project/'reports/floorplans.html'
+    if legacy_page.exists():
+        legacy_page.unlink()
     workflow=read_json(project/'workflow.json')
     for stage, record in workflow['stages'].items():
+        if stage not in STAGES:
+            continue
         try:
             # A stale page must never claim that its current content is the approved snapshot.
             validate(project,stage)
@@ -60,6 +66,8 @@ def refresh(project):
                 page.unlink()
     # Second pass updates navigation once all valid pages exist.
     for stage, record in workflow['stages'].items():
+        if stage not in STAGES:
+            continue
         if (project/'reports'/(stage+'.html')).exists():
             render(project,stage,states,record)
     if any((project/(s+'.json')).exists() for s in ('anchors','assets','floorplans')):
@@ -80,6 +88,8 @@ def submit(project, stage):
         record['fingerprint']=digest({'stage':stage,'contentFingerprint':fp['fingerprint'],'revision':revision})
         archive=project/'history'/stage/str(revision)
         write_json(archive/'data.json',read_json(project/(stage+'.json')))
+        if stage=='assets':
+            write_json(archive/'floorplans.json',read_json(project/'floorplans.json'))
         write_json(archive/'manifest.json',record)
         workflow['stages'][stage]=record
         write_json(project/'workflow.json',workflow)

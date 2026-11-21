@@ -97,19 +97,15 @@ def validate(project, stage, require_outputs=True):
     from import_novel import canonical_source
     source=canonical_source(project,data if stage=='brief' else load(project,'brief'))
     if require_outputs:
-        reviewed = data.get('images', []) + data.get('clips', [])
+        reviewed = data.get('clips', [])
         if stage == 'edit':
             reviewed += data['episodes']
         for item in reviewed:
-            check(item['qc']['checked'], f'{item["id"]}: 尚未完成看图/看片检查')
+            check(item['qc']['checked'], f'{item["id"]}: 尚未完成看片检查')
     for name in file_refs(data):
         # During assembly the final output is the only file allowed not to exist yet.
         output_files = {e['file'] for e in data.get('episodes', [])} if stage == 'edit' else set()
         local_path(project, name, exists=require_outputs or name not in output_files)
-    if stage in ('anchors','assets','floorplans','frames'):
-        from image_review import inspect_review
-        for img in data['images']:
-            inspect_review(project,stage,img)
     if stage == 'brief':
         from video_backend import settings
         config=settings(data)
@@ -180,11 +176,6 @@ def validate(project, stage, require_outputs=True):
         if stage == 'anchors':
             exact([x['entityId'] for x in data['images']], scope['characterIds'], '所选集每个角色一个定妆锚点')
             check(all(x['view'] in ('character-sheet','front-full') and not x['referenceIds'] for x in data['images']), '定妆图使用 character-sheet（兼容旧 front-full），派生引用为空')
-            for image in data['images']:
-                if image['view']=='character-sheet':
-                    criteria={c['id']:c for c in image['qc']['criteria']}
-                    for key in ('sheet_layout','sheet_identity','sheet_views','sheet_details','sheet_no_hair_crop','sheet_head_mosaic'):
-                        check(key in criteria and criteria[key]['priority']=='critical','角色设定图缺少关键验收项: '+key)
         else:
             anchors = indexed(load(project, 'anchors')['images'])
             indexed(list(anchors.values()) + data['images'])
@@ -203,6 +194,7 @@ def validate(project, stage, require_outputs=True):
             used_props = {p for s in script_scenes(project) for p in s['propIds']}
             for entity in used_scenes | used_props:
                 check(any(x['entityId'] == entity for x in data['images']), entity + ': 缺少本批参考图')
+            validate(project,'floorplans',require_outputs=require_outputs)
     elif stage == 'floorplans':
         from spatial import layout_check
         assets=indexed(load(project,'assets')['images'])
@@ -213,12 +205,7 @@ def validate(project, stage, require_outputs=True):
             refs(plan['referenceIds'],assets,'俯视图场景参考')
             for id in plan['referenceIds']:
                 check(assets[id]['entityId']==plan['entityId'],'俯视图不能引用其他场景')
-                check(assets[id]['qc']['checked'] and assets[id]['qc']['outcome'] in ('passed','best_available'),'场景图必须先完成验收选图')
                 check(plan['file']!=assets[id]['file'],'俯视图必须另行制作，不能冒用场景原图')
-            categories={c['id']:c for c in plan['qc']['criteria']}
-            for criterion in ('layout','openings','furniture','orientation','paths','unknowns'):
-                check(criterion in categories,'俯视图缺少专项验收项: '+criterion)
-                check(categories[criterion]['priority']=='critical','俯视图空间一致性验收必须标为关键要求')
             indexed(plan['layout']['items']);layout_check(plan['layout'])
     elif stage == 'staging':
         scenes = indexed(script_scenes(project))

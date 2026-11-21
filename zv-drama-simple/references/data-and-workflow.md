@@ -31,16 +31,16 @@ project/
 | characters | characters[id,name,appearance,personality,costume,speechStyle,voiceDirection,imagePrompt,origin] |
 | art | scenes[id,name,layout,anchors,lighting,imagePrompt]；props[id,name,scale,states,imagePrompt] |
 | script | episodes[id,targetSeconds,scenes[id,locationId,lighting,characterIds,propIds,beats]] |
-| anchors/assets | images[id,entityId,view,file,prompt,referenceIds,qc] |
-| floorplans | images[id,entityId,view=overhead,file,prompt,referenceIds,layout,qc] |
+| anchors/assets | images[id,entityId,view,file,prompt,referenceIds] |
+| floorplans | images[id,entityId,view=overhead,file,prompt,referenceIds,layout] |
 | staging | locations[id,imageId,floorplanId,items]；scenes[sceneId,locationId,places,extras,extrasWhere,opening] |
 | storyboard | segments[id,episodeId,sceneId,mode,sound,shots] |
-| frames | images[id,segmentId,shotId,role,file,prompt,referenceIds,qc] |
+| frames | images[id,segmentId,shotId,role,file,prompt,referenceIds] |
 | clips | clips[id,segmentId,taskId,file,seconds,qc] |
 | edit | episodes[id,cuts,audioTracks,nativeGain,captions,subtitleMode,file,qc] |
 
 origin = `{kind: source|adapted|invented, evidence, reason}`。
-视频 qc = `{checked: boolean, notes: string}`；图片 qc 还必须包含 criteria、attempts、contextFingerprint、selectedAttempt、outcome，见 [图片验收](image-review.md)。这些都是模型检查记录，不是用户批准。图像/视频审核时 checked 必须 true，notes 描述实际检查。后期准备时可以先 false，合成和审片后再改 true。
+视频及成片 qc = `{checked: boolean, notes: string}`，实际审片后才能标记 checked=true，用户批准另行记录。图片不要求 qc；旧图片 qc 仅兼容存档，不参与验收、候选文件依赖或 HTML 展示。见 [图片展示与用户确认](image-review.md)。
 
 ID 只用字母开头的英数字、下划线、连字符，最多 80 字符。建议 C01 人物、S01 地点、P01 道具、E01 集、SC01 场次、B01 节拍、A01 素材、SEG01 段、SH01 镜头、F01 分镜图、V01 视频。集 ID 使用 E01 这样的数字编号；跨批次复制时保持既有 ID。
 
@@ -84,6 +84,6 @@ ready → submit → pending → approve → approved
 
 小说输入一律先按 [输入规范](novel-input.md) 归一到 source/novel.md。brief.sourceFile 固定为该路径；所有后续阶段同时检查转换核对状态，不读取归档原文件。
 
-新增 floorplans 为场景素材之后的独立确认步骤，详见 [俯视图与机位合同](floorplans.md)。旧项目先补俯视图并确认，更新 staging.floorplanId/items、shot.spatial 以及帧参考图后重新审核；不要复用旧分镜确认。
+floorplans.json 归属第 7 步 assets，与场景图共同校验、归档及确认，详见 [俯视图与机位合同](floorplans.md)。旧项目的独立 floorplans 记录仅保留历史、不再显示为步骤；assets 重新提交确认，更新 staging.floorplanId/items、shot.spatial 以及帧参考图后重新审核；不要复用旧分镜确认。
 
 角色音色在 clips 阶段建立，规范见 [角色音色库](voices.md)。它不增加审批步骤；音频和库文件纳入 clips 指纹，后续视频任务自动带允许的参考音频。

@@ -13,8 +13,7 @@ FOCUS = dict(zip(STAGES, [
     '确认空间关系、识别锚点、光照变化与叙事道具。',
     '按场次阅读动作和台词，确认戏剧节奏与预计时长。',
     '先看脸、身形与服装；定妆确认后再生成其他视角。',
-    '检查角色派生图、无人场景与道具的一致性及完整性。',
-    '对照已确认场景图，核对俯视布局、门窗、家具、通道和未知区域。',
+    '检查参考图一致性；每个场景核对唯一俯视图的布局、门窗、家具与通道。',
     '对照实际场景图检查开场人物位置、朝向、坐站和群演。',
     '确认镜头顺序、时长、动作、对白、运镜与状态衔接。',
     '逐格检查人物、构图、空间关系与前后连续性。',
@@ -35,10 +34,10 @@ def fields(pairs):
 
 def card(title, content, cls=''):
     media_class=' card-with-media' if any(tag in content for tag in ('<img','<video','<svg','<audio')) else ''
-    return (f'<article class="card expandable-card{media_class} {cls}" tabindex="0" aria-label="{esc(title)}">'
+    return (f'<div class="card-slot{media_class}"><article class="card expandable-card{media_class} {cls}" tabindex="0" aria-label="{esc(title)}">'
             f'<h3>{esc(title)}</h3><div class="card-body">{content}</div>'
             '<details class="card-expansion"><summary><span class="expand-label">展开完整内容</span>'
-            '<span class="collapse-label">收起内容</span></summary></details></article>')
+            '<span class="collapse-label">收起内容</span></summary></details></article></div>')
 
 def origin(item):
     o = item.get('origin')
@@ -102,7 +101,7 @@ def scene_relation_panel(project,stage=None,image=None):
     return '<details class="adjacency"><summary>相邻场景关系与对照图 · '+str(len(rows))+' 条关系</summary>'+body+'</details>'
 
 
-def content(project, stage, data):
+def content(project, stage, data, tiles_only=False):
     def get(stage):
         return read_json(Path(project) / (stage + '.json'))
     if stage == 'brief':
@@ -156,23 +155,11 @@ def content(project, stage, data):
             if stage=='frames':
                 seg=segs[image['segmentId']]
                 label=seg['episodeId']+' / '+seg['sceneId']+' / '+seg['id']+' / '+image['shotId']+' · '+image['role']
-            details = scene_relation_panel(project,stage,image)+fields([('用途',label),('提示词',image['prompt']),('参考图',' / '.join(image['referenceIds']) or '无'),('图像检查',image['qc']['notes'])])
-            qc=image['qc'];requirements={c['id']:c for c in qc['criteria']}
-            result_labels={'pass':'符合','fail':'不符合','uncertain':'无法判断'}
-            verdict='全部验收项符合' if qc['outcome']=='passed' else '已重做3次，采用最合适候选；仍有问题'
-            details+=fields([('验收结论',verdict),('采用版本',f'第 {qc["selectedAttempt"]} 次（0 为首次生成）')])
-            chosen_attempt=next(a for a in qc['attempts'] if a['attempt']==qc['selectedAttempt'])
-            remaining=[requirements[c['criterionId']]['requirement']+'：'+result_labels[c['result']]+'，'+c['observation'] for c in chosen_attempt['checks'] if c['result']!='pass']
-            if remaining:
-                details+=fields([('仍需注意的问题','\n'.join(remaining))])
-            for attempt in qc['attempts']:
-                checks=''.join(field(requirements[c['criterionId']]['requirement'],result_labels[c['result']]+'：'+c['observation']) for c in attempt['checks'])
-                chosen=' · 已采用' if attempt['attempt']==qc['selectedAttempt'] else ''
-                details+=f'<details><summary>候选 {attempt["attempt"]}{chosen}</summary>'+media(project,attempt['file'])+'<dl>'+checks+'</dl>'+fields([('本次修正',attempt['correction'] or '首次生成'),('实际提示词',attempt['prompt'])])+'</details>'
+            details = scene_relation_panel(project,stage,image)+fields([('用途',label),('提示词',image['prompt']),('参考图',' / '.join(image['referenceIds']) or '无')])
             visual=media(project,image['file'])
             if stage=='floorplans':
                 scene_images={a['id']:a for a in get('assets')['images']}
-                visual='<div class="two-col"><div><p>已确认场景图</p>'+media(project,scene_images[image['referenceIds'][0]]['file'])+'</div><div><p>对应场景俯视图</p>'+visual+'</div></div>'
+                visual='<div class="two-col"><div><p>来源场景图</p>'+media(project,scene_images[image['referenceIds'][0]]['file'])+'</div><div><p>对应场景俯视图</p>'+visual+'</div></div>'
                 details+=fields([('坐标方向',image['layout']['orientation']),('空间关系',image['layout']['spatialNotes']),('未知区域',image['layout']['unknownZones']),('物件布局',image['layout']['items'])])
             title=image['id']+' · '+image.get('view',image.get('role',''))
             if stage=='frames':
@@ -199,6 +186,13 @@ def content(project, stage, data):
                     parts.append('<section class="frame-segment"><header class="frame-segment-heading"><h3>小段 '+str(number)+' <span>'+esc(seg['id'])+'</span></h3><p>'+esc(seg['sceneId'])+' · '+mode+' · '+f'{seconds:g}'+' 秒 · '+str(len(tiles))+' 张图</p></header><div class="grid">'+(''.join(tiles) or '<p class="empty">本小段尚无分镜图</p>')+'</div></section>')
                 sections.append('<section class="frame-episode"><header class="frame-episode-heading"><h2>'+esc(episode_title)+' <span>'+esc(episode_id)+'</span></h2><p>'+str(len(segments))+' 个小段</p></header>'+''.join(parts)+'</section>')
             return '<p class="lead">按集 → 小段 → 镜头顺序查看；同一小段的关键帧或首尾帧集中展示。</p>'+''.join(sections)
+        if tiles_only:
+            return body
+        if stage=='assets':
+            # Keep the unique floorplan beside this scene's state images.
+            for plan in get('floorplans')['images']:
+                plan_html=content(project,'floorplans',{'images':[plan]},tiles_only=True)
+                grouped.setdefault(plan['entityId'],[]).append(plan_html)
         if grouped:
             return '<p><a href="asset-library.html">查看全部人物、道具与场景状态 →</a></p>'+''.join(
                 '<section class="asset-group"><h2>'+esc(entities.get(id,id))+' <span class="time">'+esc(id)+' · '+str(len(tiles))+' 张</span></h2><div class="grid">'+''.join(tiles)+'</div></section>' for id,tiles in grouped.items())
@@ -304,19 +298,14 @@ def render_asset_library(project):
         path=project/(stage+'.json')
         if not path.exists():continue
         for img in read_json(path)['images']:
-            qc=img.get('qc',{});verdict={'passed':'验收通过','best_available':'采用最合适候选，仍有问题'}.get(qc.get('outcome'),'待检查')
-            try:
-                from image_review import inspect_review
-                inspect_review(project,stage,img)
-            except (ValueError,OSError,KeyError):verdict='需重新核对 · 检查记录缺失或已过期'
-            detail=scene_relation_panel(project,stage,img)+fields([('状态 / 视角',img['view']),('验收记录',verdict),('检查说明',qc.get('notes','待检查'))])
+            detail=scene_relation_panel(project,stage,img)+fields([('状态 / 视角',img['view']),('提示词',img['prompt'])])
             try:visual=media(project,img['file'])
             except (ValueError,OSError):visual='<p class="notice">图片文件不可用，请修复后重新审核。</p>'
             tile=card(img['id'],visual+detail)
             groups.setdefault(img['entityId'],[]).append(tile)
     body=''.join('<section class="asset-group"><h2>'+esc(names.get(id,id))+' <span class="time">'+esc(id)+' · '+str(len(tiles))+' 张状态图</span></h2><div class="grid">'+''.join(tiles)+'</div></section>' for id,tiles in groups.items())
     css=(BASE/'templates/style.css').read_text()
-    atomic_text(project/'reports/asset-library.html','<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>人物、道具与场景状态库</title><style>'+css+'</style><body class="overview"><main class="dashboard"><a class="back-link" href="index.html">← 返回制作总览</a><div class="eyebrow">ASSET LIBRARY</div><h1>人物、道具与场景状态库</h1><p class="lead">同一实体的定妆、视角、剧情状态与俯视图归在同组。检查记录不代表用户已确认；新状态必须对照组内图片复核。</p>'+body+'<footer>只读快照 · '+esc(now())+'</footer></main></body></html>')
+    atomic_text(project/'reports/asset-library.html','<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>人物、道具与场景状态库</title><style>'+css+'</style><body class="overview"><main class="dashboard"><a class="back-link" href="index.html">← 返回制作总览</a><div class="eyebrow">ASSET LIBRARY</div><h1>人物、道具与场景状态库</h1><p class="lead">同一实体的定妆、视角、剧情状态与俯视图归在同组。图片由用户在对应步骤确认；同一场景的状态复用唯一俯视图。</p>'+body+'<footer>只读快照 · '+esc(now())+'</footer></main></body></html>')
 
 
 def render_index(project, states):
@@ -328,8 +317,8 @@ def render_index(project, states):
     demo=workflow.get('demo',False)
     phases=''
     groups=[('01 / STORY','故事策划','先确定故事，再定义人物与世界。',states[:5]),
-            ('02 / VISUAL','视觉制作','让人物、场景和镜头保持一致。',states[5:11]),
-            ('03 / DELIVERY','视频交付','生成片段，校准声音，完成剪辑。',states[11:])]
+            ('02 / VISUAL','视觉制作','让人物、场景和镜头保持一致。',states[5:10]),
+            ('03 / DELIVERY','视频交付','生成片段，校准声音，完成剪辑。',states[10:])]
     for label,name,description,rows in groups:
         items=''
         for row in rows:

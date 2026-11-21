@@ -9,12 +9,12 @@ import tempfile
 from datetime import datetime, timezone
 
 BASE = Path(__file__).resolve().parent.parent
-STAGES = ['brief','outline','characters','art','script','anchors','assets','floorplans','staging','storyboard','frames','clips','edit']
-LABELS = dict(zip(STAGES, ['制作要求','改编大纲','角色设定','场景与道具','分集剧本','角色定妆','制作参考图','场景俯视图','场次站位','分镜方案','分镜图','视频片段','每集成片']))
+STAGES = ['brief','outline','characters','art','script','anchors','assets','staging','storyboard','frames','clips','edit']
+LABELS = dict(zip(STAGES, ['制作要求','改编大纲','角色设定','场景与道具','分集剧本','角色定妆','制作参考图与俯视图','场次站位','分镜方案','分镜图','视频片段','每集成片']))
 DEPS = {'brief':[], 'outline':['brief'], 'characters':['outline'], 'art':['outline'],
         'script':['brief','outline','characters','art'], 'anchors':['brief','characters','script'],
-        'assets':['brief','anchors','art','script'], 'floorplans':['assets','script'], 'staging':['script','assets','floorplans'],
-        'storyboard':['brief','script','staging','assets','floorplans'], 'frames':['storyboard','assets','floorplans'],
+        'assets':['brief','anchors','art','script'], 'floorplans':['brief','anchors','art','script'], 'staging':['script','assets'],
+        'storyboard':['brief','script','staging','assets'], 'frames':['storyboard','assets'],
         'clips':['frames','storyboard'], 'edit':['brief','script','clips']}
 
 def now():
@@ -52,13 +52,15 @@ def local_path(project, name, exists=True):
     return candidate
 
 def stage_path(project, stage):
-    if stage not in STAGES:
+    if stage not in STAGES and stage != 'floorplans':
         raise ValueError('未知步骤: ' + stage)
     return local_path(project, stage + '.json')
 
 def file_refs(data):
     if isinstance(data, dict):
         for key, value in data.items():
+            if key=='qc':
+                continue  # Historical review candidates are not production dependencies.
             if key in ('file', 'sourceFile') and isinstance(value, str):
                 yield value
             else:
@@ -86,6 +88,11 @@ def fingerprint(project, stage, cache=None):
     p = stage_path(project, stage)
     data = read_json(p)
     files = {name:file_digest(local_path(project, name)) for name in sorted(set(file_refs(data)))}
+    if stage=='assets':
+        plans=local_path(project,'floorplans.json')
+        files['floorplans.json']=file_digest(plans)
+        for name in file_refs(read_json(plans)):
+            files[name]=file_digest(local_path(project,name))
     if stage=='brief':
         files['source/conversion.json']=file_digest(local_path(project,'source/conversion.json'))
     if stage=='clips' and local_path(project,'voices.json',exists=False).exists():
@@ -94,7 +101,7 @@ def fingerprint(project, stage, cache=None):
             files[name]=file_digest(local_path(project,name))
     deps = {s:fingerprint(project, s, cache)['fingerprint'] for s in DEPS[stage]}
     value = {'dataHash':file_digest(p), 'files':files, 'dependencies':deps}
-    if STAGES.index(stage)>=STAGES.index('anchors'):
+    if stage=='floorplans' or STAGES.index(stage)>=STAGES.index('anchors'):
         from production_scope import selection
         value['productionScope']=selection(project)
     value['fingerprint'] = digest(value)
